@@ -1,0 +1,47 @@
+# include job templates
+include:
+  - project: 'integrator1/devops/gitlab-ci-jobs'
+    ref: master
+    file: 'common/test-gradle.gitlab-ci.yml'
+  - project: 'integrator1/devops/gitlab-ci-jobs'
+    ref: master
+    file: 'common/sonarqube.gitlab-ci.yml'
+  - project: 'integrator1/devops/gitlab-ci-jobs'
+    ref: master
+    file: 'common/build-gradle.gitlab-ci.yml'    
+
+stages:
+  - tests
+  - quality
+
+# check code quality 
+code_quality:
+  extends:
+    - .check_code_quality
+  only:
+    - dev
+    - merge_requests
+    - /^.*rc.*$/
+    - /^.*release.*$/    
+    - /^.*hotfix.*$/
+    
+tests&build:
+  image: $CI_REGISTRY/integrator/devops/openjdk-17-slim-docker:d837de0d
+  extends:
+    - .test-gradle
+  script:
+    - mkdir -p $HOME/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n $CI_REGISTRY_USER:$CI_REGISTRY_PASSWORD | base64)\"}}}" > $HOME/.docker/config.json      
+    - ./gradlew -PmavenUser=$MAVEN_USER -PmavenPassword=$MAVEN_PASSWORD check build publish dockerPush
+    - docker images --format "{{json . }}" --no-trunc > images.json    
+  only:
+    - dev
+    - /^.*rc.*$/
+    - /^.*release.*$/    
+    - /^.*hotfix.*$/
+    - master
+    
+tests-mr:
+  image: $CI_REGISTRY/integrator/devops/openjdk-17-slim-docker:d837de0d
+  extends:
+    - .test-mr-gradle
