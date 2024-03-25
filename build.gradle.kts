@@ -129,13 +129,15 @@ subprojects {
             }
             mavenBom("com.wavesenterprise:we-sdk-bom:$weSdkBomVersion") {
                 bomProperty("kotlin.version", kotlinVersion)
+                bomProperty("we-contract-sdk.version", "1.3.2-c0e7da43-SNAPSHOT")
+                bomProperty("we-node-client.version", "1.2.9-db0566e3-SNAPSHOT")
             }
         }
     }
 
     tasks.withType<KotlinCompile>().configureEach {
         kotlinOptions {
-            freeCompilerArgs = listOf("-Xjsr305=strict")
+            freeCompilerArgs = listOf("-Xjsr305=strict", "-Xjvm-default=all-compatibility")
             jvmTarget = JavaVersion.VERSION_17.toString()
         }
     }
