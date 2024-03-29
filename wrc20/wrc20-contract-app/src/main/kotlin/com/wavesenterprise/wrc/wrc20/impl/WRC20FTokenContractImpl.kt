@@ -17,7 +17,6 @@ import com.wavesenterprise.wrc.wrc20.MAPPING_ALLOWANCES
 import com.wavesenterprise.wrc.wrc20.MAPPING_BALANCES
 import com.wavesenterprise.wrc.wrc20.PERM_MINTER
 import com.wavesenterprise.wrc.wrc20.WRC20FTokenContract
-import org.springframework.beans.factory.annotation.Autowired
 
 @ContractHandler
 class WRC20FTokenContractImpl private constructor(
@@ -31,7 +30,6 @@ class WRC20FTokenContractImpl private constructor(
 
     // TODO: 02.02.2021 Java reflection not works well with kotlin default arguments
     // see https://stackoverflow.com/questions/46245206/how-can-i-instantiate-an-object-using-default-constructor-parameter-values-in-ko
-    @Autowired
     constructor(
         state: ContractState,
         call: ContractCall
