@@ -1,5 +1,5 @@
 build:
-  maxIssues: 30
+  maxIssues: 100
   weights:
   # complexity: 2
   # LongParameterList: 1
@@ -57,9 +57,9 @@ complexity:
     active: false
     threshold: 10
     includeStaticDeclarations: false
-  CyclomaticComplexMethod:
+  ComplexMethod:
     active: true
-    threshold: 15
+    threshold: 10
     ignoreSingleWhenExpression: false
     ignoreSimpleWhenEntries: false
   LabeledExpression:
@@ -75,7 +75,7 @@ complexity:
     active: true
     functionThreshold: 7
     constructorThreshold: 7
-    ignoreDefaultParameters: true
+    ignoreDefaultParameters: false
   MethodOverloading:
     active: false
     threshold: 6
@@ -109,6 +109,7 @@ complexity:
     thresholdInEnums: 11
     ignoreDeprecated: false
     ignorePrivate: false
+    ignoreOverridden: false
 
 empty-blocks:
   active: true
@@ -129,6 +130,7 @@ empty-blocks:
     active: true
   EmptyFunctionBlock:
     active: true
+    ignoreOverridden: false
   EmptyIfBlock:
     active: true
   EmptyInitBlock:
@@ -233,6 +235,7 @@ formatting:
     active: true
     autoCorrect: true
     indentSize: 4
+    continuationIndentSize: 4
   MaximumLineLength:
     active: true
     maxLineLength: 120
@@ -372,6 +375,7 @@ naming:
       - "**/*.Spek.kt"
     functionPattern: '^([a-z$][a-zA-Z$0-9]*)|(`.*`)$'
     excludeClassPattern: '$^'
+    ignoreOverridden: true
   FunctionParameterNaming:
     active: true
     excludes:
@@ -382,6 +386,7 @@ naming:
       - "**/*.Spek.kt"
     parameterPattern: '[a-z][A-Za-z0-9]*'
     excludeClassPattern: '$^'
+    ignoreOverridden: true
   InvalidPackageDeclaration:
     active: false
     rootPackage: ''
@@ -389,6 +394,7 @@ naming:
     active: true
   MemberNameEqualsClassName:
     active: false
+    ignoreOverridden: true
   ObjectPropertyNaming:
     active: true
     excludes:
@@ -449,6 +455,7 @@ naming:
     variablePattern: '[a-z][A-Za-z0-9]*'
     privateVariablePattern: '(_)?[a-z][A-Za-z0-9]*'
     excludeClassPattern: '$^'
+    ignoreOverridden: true
 
 performance:
   active: true
@@ -463,7 +470,7 @@ performance:
       - "**/*.Spec.kt"
       - "**/*.Spek.kt"
   SpreadOperator:
-    active: false
+    active: true
     excludes:
       - "**/test/**"
       - "**/androidTest/**"
@@ -475,6 +482,8 @@ performance:
 
 potential-bugs:
   active: true
+  DuplicateCaseInWhenExpression:
+    active: true
   EqualsAlwaysReturnsTrueOrFalse:
     active: false
   EqualsWithHashCodeExist:
@@ -495,8 +504,10 @@ potential-bugs:
       - "**/*.Test.kt"
       - "**/*.Spec.kt"
       - "**/*.Spek.kt"
-    ignoreAnnotated:
+    excludeAnnotatedProperties:
     ignoreOnClassesPattern: ""
+  MissingWhenCase:
+    active: false
   UnconditionalJumpStatementInLoop:
     active: false
   UnreachableCode:
@@ -516,8 +527,7 @@ style:
     active: false
   DataClassContainsFunctions:
     active: false
-    conversionFunctionPrefix:
-      - 'to'
+    conversionFunctionPrefix: 'to'
   DataClassShouldBeImmutable:
     active: false
   EqualsNullCall:
@@ -531,23 +541,20 @@ style:
     includeLineWrapping: false
   ForbiddenComment:
     active: true
-    comments:
-      - reason: 'Forbidden FIXME todo marker in comment, please fix the problem.'
-        value: 'FIXME:'
-      - reason: 'Forbidden STOPSHIP todo marker in comment, please address the problem before shipping the code.'
-        value: 'STOPSHIP:'
-      - reason: 'Forbidden TODO todo marker in comment, please do the changes.'
-        value: 'TODO:'
+    values:
+      - TODO
+      - FIXME
+      - STOPSHIP
   ForbiddenImport:
     active: false
     imports:
   ForbiddenVoid:
     active: false
+    ignoreOverridden: false
   FunctionOnlyReturningConstant:
     active: false
     ignoreOverridableFunction: true
-    excludedFunctions:
-      - 'describeContents'
+    excludedFunctions: 'describeContents'
   LoopWithTooManyJumpStatements:
     active: false
     maxJumpCount: 1
@@ -572,6 +579,8 @@ style:
     ignoreNamedArgument: true
     ignoreEnums: false
     ignoreRanges: false
+  MandatoryBracesIfStatements:
+    active: false
   MaxLineLength:
     active: true
     maxLineLength: 120
@@ -592,7 +601,7 @@ style:
     active: true
   OptionalUnit:
     active: false
-  BracesOnWhenStatements:
+  OptionalWhenBraces:
     active: false
   PreferToOverPairSyntax:
     active: false
@@ -603,8 +612,7 @@ style:
   ReturnCount:
     active: true
     max: 3
-    excludedFunctions:
-      - "equals"
+    excludedFunctions: "equals"
     excludeLabeled: false
     excludeReturnFromLambda: true
   SafeCast:
@@ -620,10 +628,10 @@ style:
     active: false
   UnderscoresInNumericLiterals:
     active: false
-    acceptableLength: 5
+    acceptableDecimalLength: 5
   UnnecessaryAbstractClass:
     active: false
-    ignoreAnnotated:
+    excludeAnnotatedClasses:
       - dagger.Module
   UnnecessaryApply:
     active: false
@@ -646,7 +654,7 @@ style:
     active: false
   UseDataClass:
     active: false
-    ignoreAnnotated:
+    excludeAnnotatedClasses:
   UseRequire:
     active: false
   UselessCallOnNotNull:
