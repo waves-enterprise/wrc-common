@@ -1,38 +1,54 @@
-import fr.brouillard.oss.jgitver.Strategies.PATTERN
 import io.gitlab.arturbosch.detekt.Detekt
 import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val mavenUser: String by project
-val mavenPassword: String by project
-
 val kotlinVersion: String by project
-val springBootVersion: String by project
 val jacocoToolVersion: String by project
 val detektVersion: String by project
 
-val registry: String by project.extra { System.getenv("CI_REGISTRY") ?: "registry.web3tech.ru" }
+val junitVersion: String by project
+val mockkVersion: String by project
 
-val weSdkBomVersion: String by project
+val weSdkContractVersion: String by project
+val weNodeClientVersion: String by project
+val jacksonVersion: String by project
+
+val sonaTypeBasePath: String by project
+val gitHubProject: String by project
+val githubUrl: String by project
+val weMavenUser: String? by project
+val weMavenPassword: String? by project
+val sonaTypeMavenUser: String? by project
+val sonaTypeMavenPassword: String? by project
+val weMavenBasePath: String by project
 
 plugins {
     kotlin("jvm") apply false
-    kotlin("kapt") apply false
-    id("org.springframework.boot") apply false
-    id("io.spring.dependency-management") apply false
-    id("org.jlleitschuh.gradle.ktlint") apply false
-    id("com.wavesplatform.vst.contract-docker") apply false
-    id("fr.brouillard.oss.gradle.jgitver")
-    id("io.gitlab.arturbosch.detekt")
-    id("jacoco")
     `maven-publish`
+    signing
+    id("io.codearte.nexus-staging")
+    id("io.spring.dependency-management") apply false
+    id("io.gitlab.arturbosch.detekt") apply false
+    id("org.jlleitschuh.gradle.ktlint") apply false
+    id("com.palantir.git-version") apply false
+    id("com.gorylenko.gradle-git-properties") apply false
+    id("fr.brouillard.oss.gradle.jgitver")
+    id("org.jetbrains.dokka")
+    id("jacoco")
+}
+
+nexusStaging {
+    serverUrl = "$sonaTypeBasePath/service/local/"
+    username = sonaTypeMavenUser
+    password = sonaTypeMavenPassword
 }
 
 jgitver {
-    strategy = PATTERN
-    versionPattern = "\${M}.\${m}.\${meta.COMMIT_DISTANCE}-\${meta.GIT_SHA1_8}\${-~meta.QUALIFIED_BRANCH_NAME}-SNAPSHOT"
+    strategy = fr.brouillard.oss.jgitver.Strategies.PATTERN
+    versionPattern =
+        "\${M}.\${m}.\${meta.COMMIT_DISTANCE}-\${meta.GIT_SHA1_8}\${-~meta.QUALIFIED_BRANCH_NAME}-SNAPSHOT"
     nonQualifierBranches = "master,dev,main"
 }
 
@@ -51,8 +67,8 @@ allprojects {
                 snapshotsOnly()
             }
             credentials {
-                username = mavenUser
-                password = mavenPassword
+                username = weMavenUser
+                password = weMavenPassword
             }
         }
 
@@ -63,19 +79,66 @@ allprojects {
                 releasesOnly()
             }
             credentials {
-                username = mavenUser
-                password = mavenPassword
+                username = weMavenUser
+                password = weMavenPassword
             }
         }
     }
 }
 
 subprojects {
+    apply(plugin = "maven-publish")
+
+    publishing {
+        repositories {
+            if (weMavenUser != null && weMavenPassword != null) {
+                maven {
+                    name = "WE-artifacts"
+                    afterEvaluate {
+                        url = uri(
+                            "$weMavenBasePath${
+                                if (project.version.toString()
+                                        .endsWith("-SNAPSHOT")
+                                ) "maven-snapshots" else "maven-releases"
+                            }"
+                        )
+                    }
+                    credentials {
+                        username = weMavenUser
+                        password = weMavenPassword
+                    }
+                }
+            }
+
+            if (sonaTypeMavenPassword != null && sonaTypeMavenUser != null) {
+                maven {
+                    name = "SonaType-maven-central-staging"
+                    val releasesUrl = uri("$sonaTypeBasePath/service/local/staging/deploy/maven2/")
+                    afterEvaluate {
+                        url = if (version.toString()
+                                .endsWith("SNAPSHOT")
+                        ) throw kotlin.Exception("shouldn't publish snapshot") else releasesUrl
+                    }
+                    credentials {
+                        username = sonaTypeMavenUser
+                        password = sonaTypeMavenPassword
+                    }
+                }
+            }
+        }
+    }
+}
+
+configure(
+    subprojects.filter { it.name != "wrc-common-bom" }
+) {
     apply(plugin = "io.spring.dependency-management")
     apply(plugin = "kotlin")
-    apply(plugin = "org.jlleitschuh.gradle.ktlint")
+    apply(plugin = "signing")
     apply(plugin = "io.gitlab.arturbosch.detekt")
+    apply(plugin = "org.jlleitschuh.gradle.ktlint")
     apply(plugin = "jacoco")
+    apply(plugin = "org.jetbrains.dokka")
 
     val jacocoCoverageFile = "$buildDir/jacocoReports/test/jacocoTestReport.xml"
 
@@ -86,11 +149,6 @@ subprojects {
                 outputLocation.set(file(jacocoCoverageFile))
             }
         }
-    }
-
-    jacoco {
-        toolVersion = jacocoToolVersion
-        reportsDirectory.set(file("$buildDir/jacocoReports"))
     }
 
     tasks.withType<Test> {
@@ -118,21 +176,96 @@ subprojects {
         buildUponDefaultConfig = true
     }
 
-    dependencies {
-        detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:$detektVersion")
+    val sourcesJar by tasks.creating(Jar::class) {
+        group = JavaBasePlugin.DOCUMENTATION_GROUP
+        description = "Assembles sources JAR"
+        archiveClassifier.set("sources")
+        from(project.the<SourceSetContainer>()["main"].allSource)
+    }
+
+    val dokkaJavadoc by tasks.getting(org.jetbrains.dokka.gradle.DokkaTask::class)
+    val javadocJar by tasks.creating(Jar::class) {
+        dependsOn(dokkaJavadoc)
+        group = JavaBasePlugin.DOCUMENTATION_GROUP
+        description = "Assembles javadoc JAR"
+        archiveClassifier.set("javadoc")
+        from(dokkaJavadoc.outputDirectory)
+    }
+
+    publishing {
+        publications {
+            create<MavenPublication>("mavenJava") {
+                from(components["java"])
+                versionMapping {
+                    allVariants {
+                        fromResolutionResult()
+                    }
+                }
+                afterEvaluate {
+                    artifact(sourcesJar)
+                    artifact(javadocJar)
+                }
+                pom {
+                    packaging = "jar"
+                    name.set(project.name)
+                    url.set(githubUrl + gitHubProject)
+                    description.set("WE Node Client for Java/Kotlin")
+
+                    licenses {
+                        license {
+                            name.set("The Apache License, Version 2.0")
+                            url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                        }
+                    }
+
+                    scm {
+                        connection.set("scm:$githubUrl$gitHubProject")
+                        developerConnection.set("scm:git@github.com:$gitHubProject.git")
+                        url.set(githubUrl + gitHubProject)
+                    }
+
+                    developers {
+                        developer {
+                            id.set("kt3")
+                            name.set("Stepan Kashintsev")
+                            email.set("kpote3@gmail.com")
+                        }
+                        developer {
+                            id.set("donyfutura")
+                            name.set("Daniil Georgiev")
+                            email.set("donyfutura@gmail.com")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    signing {
+        afterEvaluate {
+            if (!project.version.toString().endsWith("SNAPSHOT")) {
+                sign(publishing.publications["mavenJava"])
+            }
+        }
     }
 
     the<DependencyManagementExtension>().apply {
         imports {
-            mavenBom("org.springframework.boot:spring-boot-dependencies:$springBootVersion") {
-                bomProperty("kotlin.version", kotlinVersion)
-            }
-            mavenBom("com.wavesenterprise:we-sdk-bom:$weSdkBomVersion") {
-                bomProperty("kotlin.version", kotlinVersion)
-                bomProperty("we-contract-sdk.version", "1.3.2-c0e7da43-SNAPSHOT")
-                bomProperty("we-node-client.version", "1.2.9-db0566e3-SNAPSHOT")
-            }
+            mavenBom("com.fasterxml.jackson:jackson-bom:$jacksonVersion")
+            mavenBom("com.wavesenterprise:we-contract-sdk-bom:$weSdkContractVersion")
+            mavenBom("com.wavesenterprise:we-node-client-bom:$weNodeClientVersion")
         }
+        dependencies {
+            dependency("io.mockk:mockk:$mockkVersion")
+            dependency("org.junit.jupiter:junit-jupiter-api:$junitVersion")
+            dependency("org.junit.jupiter:junit-jupiter-params:$junitVersion")
+            dependency("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
+        }
+    }
+
+    jacoco {
+        toolVersion = jacocoToolVersion
+        reportsDirectory.set(file("$buildDir/jacocoReports"))
     }
 
     tasks.withType<KotlinCompile>().configureEach {

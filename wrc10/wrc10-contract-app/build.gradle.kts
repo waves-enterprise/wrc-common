@@ -1,10 +1,10 @@
-val vstCommonsVersion: String by project
-val mavenUser: String by project
-val mavenPassword: String by project
-val registry: String by rootProject.extra
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
-    `maven-publish`
+    kotlin("jvm")
+    application
+    java
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 dependencies {
@@ -22,28 +22,10 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
 
-java {
-    withSourcesJar()
+tasks.withType<ShadowJar> {
+    manifest {
+        attributes["Main-Class"] = "com.wavesenterprise.wrc.wrc10.WRC10RoleBasedAccessControlStarterKt"
+    }
 }
 
-publishing {
-    repositories {
-        maven {
-            name = "maven"
-            url = uri(
-                "https://artifacts.wavesenterprise.com/repository/" +
-                    if (project.version.toString().endsWith("-SNAPSHOT")) "maven-snapshots"
-                    else "maven-releases"
-            )
-            credentials {
-                username = mavenUser
-                password = mavenPassword
-            }
-        }
-    }
-    publications {
-        create<MavenPublication>("maven") {
-            from(components["java"])
-        }
-    }
-}
+project.setProperty("mainClassName", "com.wavesenterprise.wrc.wrc10.WRC10RoleBasedAccessControlStarterKt")
