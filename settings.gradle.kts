@@ -1,7 +1,4 @@
 pluginManagement {
-    val weMavenUser: String by settings
-    val weMavenPassword: String by settings
-
     val kotlinVersion: String by settings
     val gradleDependencyManagementVersion: String by settings
     val detektVersion: String by settings
@@ -30,28 +27,6 @@ pluginManagement {
         gradlePluginPortal()
         mavenLocal()
         mavenCentral()
-        maven {
-            name = "maven-snapshots"
-            url = uri("https://artifacts.wavesenterprise.com/repository/maven-snapshots/")
-            mavenContent {
-                snapshotsOnly()
-            }
-            credentials {
-                username = weMavenUser
-                password = weMavenPassword
-            }
-        }
-        maven {
-            name = "maven-releases"
-            url = uri("https://artifacts.wavesenterprise.com/repository/maven-releases/")
-            mavenContent {
-                releasesOnly()
-            }
-            credentials {
-                username = weMavenUser
-                password = weMavenPassword
-            }
-        }
     }
 }
 
