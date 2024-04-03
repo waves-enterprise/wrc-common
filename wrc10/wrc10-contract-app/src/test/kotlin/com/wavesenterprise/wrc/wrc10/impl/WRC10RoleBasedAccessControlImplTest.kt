@@ -2,11 +2,13 @@ package com.wavesenterprise.wrc.wrc10.impl
 
 import com.wavesenterprise.sdk.contract.api.domain.DefaultContractCall
 import com.wavesenterprise.sdk.contract.api.state.ContractState
+import com.wavesenterprise.sdk.contract.api.state.TypeReference
 import com.wavesenterprise.sdk.contract.test.state.ContractTestStateFactory
 import com.wavesenterprise.sdk.node.domain.Address
 import com.wavesenterprise.sdk.node.test.data.TestDataFactory.Companion.contractTransaction
 import com.wavesenterprise.sdk.node.test.data.Util.Companion.randomStringBase58
 import com.wavesenterprise.wrc.wrc10.DefaultPermissions
+import com.wavesenterprise.wrc.wrc10.StateMappings
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -37,6 +39,8 @@ class WRC10RoleBasedAccessControlImplTest {
             init()
 
             assertTrue(isOwner(owner))
+            assertTrue(state["${StateMappings.PERMISSIONS}_$owner", object : TypeReference<Set<String>>() {}].isEmpty())
+            assertTrue(state["${StateMappings.ROLE_ADMINS}_$owner", object : TypeReference<Set<String>>() {}].isEmpty())
         }
     }
 

@@ -2,8 +2,8 @@ package com.wavesenterprise.wrc.wrc10.impl
 
 import com.wavesenterprise.sdk.contract.api.domain.ContractCall
 import com.wavesenterprise.sdk.contract.api.state.ContractState
-import com.wavesenterprise.sdk.contract.api.state.TypeReference
 import com.wavesenterprise.sdk.contract.api.state.mapping.Mapping
+import com.wavesenterprise.sdk.contract.core.state.getValue
 import com.wavesenterprise.wrc.wrc10.DefaultPermissions
 import com.wavesenterprise.wrc.wrc10.StateMappings
 import com.wavesenterprise.wrc.wrc10.WRC10RoleBasedAccessControl
@@ -13,16 +13,12 @@ class WRC10RoleBasedAccessControlImpl(
     private val call: ContractCall,
 ) : WRC10RoleBasedAccessControl {
 
-    internal val permissions: Mapping<Set<String>> = state.getMapping(
-        object : TypeReference<Set<String>>() {},
-        StateMappings.PERMISSIONS,
-    )
-    internal val roleAdmins: Mapping<Set<String>> = state.getMapping(
-        object : TypeReference<Set<String>>() {},
-        StateMappings.ROLE_ADMINS
-    )
+    internal val permissions: Mapping<Set<String>> by state
+    internal val roleAdmins: Mapping<Set<String>> by state
 
     fun init() {
+        permissions.put(call.caller, setOf())
+        roleAdmins.put(call.caller, setOf())
         state.put(StateMappings.OWNER, call.caller)
     }
 
@@ -61,21 +57,22 @@ class WRC10RoleBasedAccessControlImpl(
     }
 }
 
-fun WRC10RoleBasedAccessControlImpl.hasPermission(address: String, permission: String) =
+fun WRC10RoleBasedAccessControlImpl.hasPermission(address: String, permission: String): Boolean =
     this.permissions.tryGet(address).map {
         it.contains(permission)
-    }.orElse(false)!!
+    }.orElse(false)
 
-fun WRC10RoleBasedAccessControlImpl.isRoleAdmin(address: String, role: String) =
+fun WRC10RoleBasedAccessControlImpl.isRoleAdmin(address: String, role: String): Boolean =
+
     this.roleAdmins.tryGet(address).map {
         it.contains(role)
-    }.orElse(false)!!
+    }.orElse(false)
 
-fun WRC10RoleBasedAccessControlImpl.permissionsOf(address: String) =
-    this.permissions.tryGet(address).orElse(setOf())!!
+fun WRC10RoleBasedAccessControlImpl.permissionsOf(address: String): Set<String> =
+    this.permissions.tryGet(address).orElse(setOf())
 
-fun WRC10RoleBasedAccessControlImpl.rolesAdministratedBy(address: String) =
-    this.roleAdmins.tryGet(address).orElse(setOf())!!
+fun WRC10RoleBasedAccessControlImpl.rolesAdministratedBy(address: String): Set<String> =
+    this.roleAdmins.tryGet(address).orElse(setOf())
 
 fun WRC10RoleBasedAccessControlImpl.isOwner(address: String) =
     this.state[StateMappings.OWNER, String::class.java] == address
