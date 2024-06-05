@@ -45,9 +45,22 @@ publishing {
 
                 developers {
                     developer {
+                        id.set("kt3")
+                        name.set("Stepan Kashintsev")
+                        email.set("kpote3@gmail.com")
+                        url.set("https://github.com/kt3")
+                    }
+                    developer {
                         id.set("donyfutura")
                         name.set("Daniil Georgiev")
                         email.set("donyfutura@gmail.com")
+                        url.set("https://github.com/donyfutura")
+                    }
+                    developer {
+                        id.set("danilagridnev")
+                        name.set("Danila Gridnev")
+                        email.set("danilagridnev@gmail.com")
+                        url.set("https://github.com/danilagridnev")
                     }
                 }
             }
