@@ -3,7 +3,7 @@
 Interfaces and reference implementations of WRC Standards
 
 
-## Building (all modules)
+## Building (all modules).
 This command will build all modules in the project and publish corresponding
 smart contracts into a docker registry
 
