@@ -24,8 +24,8 @@ dependencies {
 
 tasks.withType<ShadowJar> {
     manifest {
-        attributes["Main-Class"] = "com.wavesenterprise.wrc.wrc10.WRC10RoleBasedAccessControlStarterKt"
+        attributes["Main-Class"] = "com.wavesenterprise.sdk.wrc.wrc10.WRC10RoleBasedAccessControlStarterKt"
     }
 }
 
-project.setProperty("mainClassName", "com.wavesenterprise.wrc.wrc10.WRC10RoleBasedAccessControlStarterKt")
+project.setProperty("mainClassName", "com.wavesenterprise.sdk.wrc.wrc10.WRC10RoleBasedAccessControlStarterKt")

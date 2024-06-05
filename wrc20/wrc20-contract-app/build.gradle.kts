@@ -23,8 +23,8 @@ dependencies {
 
 tasks.withType<ShadowJar> {
     manifest {
-        attributes["Main-Class"] = "com.wavesenterprise.wrc.wrc20.WRC20FTokenContractStarterKt"
+        attributes["Main-Class"] = "com.wavesenterprise.sdk.wrc.wrc20.WRC20FTokenContractStarterKt"
     }
 }
 
-project.setProperty("mainClassName", "com.wavesenterprise.wrc.wrc20.WRC20FTokenContractStarterKt")
+project.setProperty("mainClassName", "com.wavesenterprise.sdk.wrc.wrc20.WRC20FTokenContractStarterKt")
