@@ -261,12 +261,10 @@ configure(
             mavenBom("com.fasterxml.jackson:jackson-bom:$jacksonVersion")
             mavenBom("com.wavesenterprise:we-contract-sdk-bom:$weSdkContractVersion")
             mavenBom("com.wavesenterprise:we-node-client-bom:$weNodeClientVersion")
+            mavenBom("org.junit:junit-bom:$junitVersion")
         }
         dependencies {
             dependency("io.mockk:mockk:$mockkVersion")
-            dependency("org.junit.jupiter:junit-jupiter-api:$junitVersion")
-            dependency("org.junit.jupiter:junit-jupiter-params:$junitVersion")
-            dependency("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
         }
     }
 
