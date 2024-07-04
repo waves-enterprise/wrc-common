@@ -28,6 +28,6 @@ interface WRC13RegistryContract : WRC10RoleBasedAccessControl {
     @ContractAction
     fun setValue(
         @InvokeParam(name = "key") key: String,
-        @InvokeParam(name = "value") value: String
+        @InvokeParam(name = "value") value: String,
     )
 }

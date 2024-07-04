@@ -24,5 +24,5 @@ private val objectMapper = jacksonObjectMapper()
     .registerModule(
         KotlinModule.Builder()
             .configure(KotlinFeature.NullIsSameAsDefault, true)
-            .build()
+            .build(),
     )
