@@ -3,7 +3,7 @@ pluginManagement {
     val gradleDependencyManagementVersion: String by settings
     val detektVersion: String by settings
     val jGitVerVersion: String by settings
-    val nexusStagingVersion: String by settings
+    val nexusPublishVersion: String by settings
     val dokkaVersion: String by settings
     val palantirGitVersion: String by settings
     val gitPropertiesVersion: String by settings
@@ -18,7 +18,7 @@ pluginManagement {
         id("com.gorylenko.gradle-git-properties") version gitPropertiesVersion apply false
         id("jacoco")
         id("org.jetbrains.dokka") version dokkaVersion
-        id("io.codearte.nexus-staging") version nexusStagingVersion
+        id("io.github.gradle-nexus.publish-plugin") version nexusPublishVersion
     }
 
     repositories {
