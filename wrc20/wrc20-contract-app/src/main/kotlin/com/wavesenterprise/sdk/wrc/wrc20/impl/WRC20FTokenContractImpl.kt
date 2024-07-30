@@ -18,6 +18,7 @@ import com.wavesenterprise.sdk.wrc.wrc20.MAPPING_BALANCES
 import com.wavesenterprise.sdk.wrc.wrc20.PERM_MINTER
 import com.wavesenterprise.sdk.wrc.wrc20.WRC20FTokenContract
 
+@Suppress("TooManyFunctions")
 @ContractHandler
 class WRC20FTokenContractImpl private constructor(
     private val state: ContractState,

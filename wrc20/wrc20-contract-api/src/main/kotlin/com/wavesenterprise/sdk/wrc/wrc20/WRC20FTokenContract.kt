@@ -25,6 +25,7 @@ interface WRC20FTokenContract : WRC10RoleBasedAccessControl {
         @InvokeParam(name = "name") name: String,
     )
 
+    @Suppress("LongParameterList")
     @ContractInit
     fun createFull(
         @InvokeParam(name = "name") name: String,
