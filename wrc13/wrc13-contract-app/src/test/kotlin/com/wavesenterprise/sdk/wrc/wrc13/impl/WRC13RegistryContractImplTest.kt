@@ -75,7 +75,7 @@ class WRC13RegistryContractImplTest {
         WRC13RegistryContractImpl(
             state = state,
             call = DefaultContractCall(
-                tx = contractTransaction(sender = Address.fromBase58(sender))
+                tx = contractTransaction(sender = Address.fromBase58(sender)),
             ),
         ).apply {
             block(this)
