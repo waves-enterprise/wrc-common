@@ -18,13 +18,14 @@ import com.wavesenterprise.sdk.wrc.wrc20.MAPPING_BALANCES
 import com.wavesenterprise.sdk.wrc.wrc20.PERM_MINTER
 import com.wavesenterprise.sdk.wrc.wrc20.WRC20FTokenContract
 
+@Suppress("TooManyFunctions")
 @ContractHandler
 class WRC20FTokenContractImpl private constructor(
     private val state: ContractState,
     private val call: ContractCall,
     private val rbac: WRC10RoleBasedAccessControlImpl,
     private val balance: Mapping<Long>,
-    private val allowances: Mapping<Long>
+    private val allowances: Mapping<Long>,
 ) : WRC20FTokenContract, WRC10RoleBasedAccessControl by rbac {
 //    AsyncContract by AsyncContractImpl(state) ToDo: Extend AsyncContractImpl WTCH-186, WTCH-187
 
@@ -32,13 +33,13 @@ class WRC20FTokenContractImpl private constructor(
     // see https://stackoverflow.com/questions/46245206/how-can-i-instantiate-an-object-using-default-constructor-parameter-values-in-ko
     constructor(
         state: ContractState,
-        call: ContractCall
+        call: ContractCall,
     ) : this(
         state,
         call,
         WRC10RoleBasedAccessControlImpl(state, call),
         state.getMapping(Long::class.java, MAPPING_BALANCES),
-        state.getMapping(Long::class.java, MAPPING_ALLOWANCES)
+        state.getMapping(Long::class.java, MAPPING_ALLOWANCES),
     )
 
     override fun create(name: String) {
@@ -48,7 +49,7 @@ class WRC20FTokenContractImpl private constructor(
             mintable = true,
             supply = 0,
             supplyHolder = "",
-            decimals = 2
+            decimals = 2,
         )
     }
 
@@ -58,7 +59,7 @@ class WRC20FTokenContractImpl private constructor(
         mintable: Boolean,
         supply: Long,
         supplyHolder: String,
-        decimals: Int
+        decimals: Int,
     ) {
         state.put(KEY_NAME, name)
         state.put(KEY_TOTAL_SUPPLY, 0L)

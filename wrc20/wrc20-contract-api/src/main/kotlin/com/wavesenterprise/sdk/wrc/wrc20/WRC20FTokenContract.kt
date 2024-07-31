@@ -22,9 +22,10 @@ interface WRC20FTokenContract : WRC10RoleBasedAccessControl {
 
     @ContractInit
     fun create(
-        @InvokeParam(name = "name") name: String
+        @InvokeParam(name = "name") name: String,
     )
 
+    @Suppress("LongParameterList")
     @ContractInit
     fun createFull(
         @InvokeParam(name = "name") name: String,
@@ -32,13 +33,13 @@ interface WRC20FTokenContract : WRC10RoleBasedAccessControl {
         @InvokeParam(name = "mintable") mintable: Boolean,
         @InvokeParam(name = "supply") supply: Long,
         @InvokeParam(name = "supplyHolder") supplyHolder: String,
-        @InvokeParam(name = "decimals") decimals: Int
+        @InvokeParam(name = "decimals") decimals: Int,
     )
 
     @ContractAction
     fun transfer(
         @InvokeParam(name = "to") to: String,
-        @InvokeParam(name = "amount") amount: Long
+        @InvokeParam(name = "amount") amount: Long,
     )
 
     @ContractAction
@@ -47,19 +48,19 @@ interface WRC20FTokenContract : WRC10RoleBasedAccessControl {
     @ContractAction
     fun mint(
         @InvokeParam(name = "to") to: String,
-        @InvokeParam(name = "amount") amount: Long
+        @InvokeParam(name = "amount") amount: Long,
     )
 
     @ContractAction
     fun approve(
         @InvokeParam(name = "to") to: String,
-        @InvokeParam(name = "amount") amount: Long
+        @InvokeParam(name = "amount") amount: Long,
     )
 
     @ContractAction
     fun transferFrom(
         @InvokeParam(name = "from") from: String,
         @InvokeParam(name = "to") to: String,
-        @InvokeParam(name = "amount") amount: Long
+        @InvokeParam(name = "amount") amount: Long,
     )
 }

@@ -219,7 +219,7 @@ class WRC10RoleBasedAccessControlImplTest {
         WRC10RoleBasedAccessControlImpl(
             state = state,
             call = DefaultContractCall(
-                tx = contractTransaction(sender = Address.fromBase58(sender))
+                tx = contractTransaction(sender = Address.fromBase58(sender)),
             ),
         ).apply {
             block(this)

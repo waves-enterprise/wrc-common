@@ -34,7 +34,7 @@ interface WRC10RoleBasedAccessControl {
     @ContractAction
     fun revoke(
         @InvokeParam(name = "from") from: String,
-        @InvokeParam(name = "role") role: String
+        @InvokeParam(name = "role") role: String,
     )
 
     /**
@@ -46,7 +46,7 @@ interface WRC10RoleBasedAccessControl {
     @ContractAction
     fun grantRoleAdmin(
         @InvokeParam(name = "to") to: String,
-        @InvokeParam(name = "role") role: String
+        @InvokeParam(name = "role") role: String,
     )
 
     /**
@@ -58,6 +58,6 @@ interface WRC10RoleBasedAccessControl {
     @ContractAction
     fun revokeRoleAdmin(
         @InvokeParam(name = "from") from: String,
-        @InvokeParam(name = "role") role: String
+        @InvokeParam(name = "role") role: String,
     )
 }

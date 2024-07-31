@@ -16,7 +16,7 @@ import com.wavesenterprise.sdk.wrc.wrc13.WRC13RegistryContract
 class WRC13RegistryContractImpl(
     private val state: ContractState,
     private val call: ContractCall,
-    internal val rbac: WRC10RoleBasedAccessControlImpl = WRC10RoleBasedAccessControlImpl(state, call)
+    internal val rbac: WRC10RoleBasedAccessControlImpl = WRC10RoleBasedAccessControlImpl(state, call),
 ) : WRC13RegistryContract, WRC10RoleBasedAccessControl by rbac {
 
     internal val data: Mapping<String> by state
